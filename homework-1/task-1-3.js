@@ -16,7 +16,6 @@ rStream.on("data", async (chunk) => {
 rStream.on("end", async () => {
     const jsonArray = await csv().fromString(file);
     try {
-        // Write back something interesting to the user:
         jsonArray.forEach(entry => {
             wStream.write(
                 JSON.stringify(entry) + "\n",
@@ -29,4 +28,4 @@ rStream.on("end", async () => {
     }
 });
 
-rStream.on("error", err => console.error("error on read: ", err));
+rStream.on("error", err => console.error("error on read: ", err))
