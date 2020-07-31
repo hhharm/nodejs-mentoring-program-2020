@@ -1,3 +1,5 @@
+//read file (sync), convert to json, write (sync)
+
 const fs = require("fs");
 const csv = require("csvtojson");
 
