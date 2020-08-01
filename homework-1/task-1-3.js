@@ -8,24 +8,26 @@ const WRITE_FILE = "homework-1/csv/nodejs-hw1-ex3.txt";
 const rStream = fs.createReadStream(READ_FILE, "utf-8");
 const wStream = fs.createWriteStream(WRITE_FILE, "utf-8");
 
-let file = "";
-rStream.on("data", async (chunk) => {
-    file += chunk;
-});
+csv().fromStream(rStream)
+    .subscribe(
+        writeNextChunk,
+        console.error,
+        endWriteStream
+    )
+    .then(() => console.log("Successfully converted"))
+    .catch(console.error);
 
-rStream.on("end", async () => {
-    const jsonArray = await csv().fromString(file);
+function writeNextChunk(chunk) {
+    wStream.write(
+        JSON.stringify(chunk) + "\n",
+        err => err && console.error("error on write: ", err)
+    );
+}
+
+function endWriteStream() {
     try {
-        jsonArray.forEach(entry => {
-            wStream.write(
-                JSON.stringify(entry) + "\n",
-                err => err && console.error("error on write: ", err)
-            );
-        });
         wStream.end();
-    } catch (err) {
-        console.error("error on write: ", err);
+    } catch (e) {
+        console.error("error on write: ", e);
     }
-});
-
-rStream.on("error", err => console.error("error on read: ", err))
+}
