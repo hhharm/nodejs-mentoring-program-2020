@@ -9,8 +9,8 @@ console.log("Waiting for input...");
 stdinStream.on("data", reverseLine);
 
 function reverseLine(str) {
-    const stringWithoutLineEnd = str.replace(/[\r\n]/g, '');
-    const charArray = stringWithoutLineEnd.split('');
+    const stringWithoutLineEnd = str.replace(/[\r\n]/g, "");
+    const charArray = stringWithoutLineEnd.split("");
 
     for (let i = 0; i < charArray.length / 2; i++) {
         swap(charArray, i, charArray.length - i - 1);
