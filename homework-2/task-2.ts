@@ -1,8 +1,11 @@
+//Both task 2.1 and 2.2
 import express from "express";
 import * as winston from "winston";
 import * as  expressWinston from "express-winston";
 import {v4 as uuidv4} from "uuid";
 import {sortBy} from "lodash";
+import * as Joi from "@hapi/joi";
+import {ValidationErrorItem, ValidationResult} from "hapi__joi";
 
 const SERVER_PORT = process.env.SERVER_PORT || 3000;
 type User = {
@@ -27,6 +30,27 @@ const MODERATOR: User = {
     age: 23,
     isDeleted: false,
 };
+// Login rules: from 8 to 20 symbols,
+// allowed only alphanum or . or _,
+// . or _ cannot follow . or _,
+// cannot start or end with _ or .
+const loginPattern = new RegExp("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
+const UserCreateSchema = Joi.object({
+    login: Joi.string().regex(loginPattern).required(),
+    password: Joi.string().alphanum().required(),
+    isDeleted: Joi.boolean().required(),
+    age: Joi.number().min(4).max(130).required()
+});
+
+const UserUpdateSchema = UserCreateSchema.keys({
+    id: Joi.string().guid().required()
+});
+
+type UserResponse = User | {
+    message: string,
+    errors?: string[]
+};
+
 const USER_COLLECTION: Record<string, User> = {
     [ADMIN.id]: ADMIN,
     [MODERATOR.id]: MODERATOR
@@ -78,24 +102,42 @@ router.get("/user/suggest", (req: express.Request, res: express.Response<{ users
     res.status(200).send({ users });
 });
 
-router.get("/user/:id", (req: express.Request, res: express.Response<User | { message: string }>) => {
+router.get("/user/:id", (req: express.Request, res: express.Response<UserResponse>) => {
     const { id } = req.params;
     res.status(200).json(USER_COLLECTION[id]);
 });
 
-router.put("/user/:id", (req: express.Request, res: express.Response<User | { message: string }>) => {
-    const { age, login, password } = req.body;
+router.put("/user/:id", (req: express.Request, res: express.Response<UserResponse>) => {
+    const validationErrs: ValidationResult<User> = UserUpdateSchema.validate(req.body, {abortEarly: false});
+    if (validationErrs.error && !!validationErrs.error.details.length) {
+        res.status(400).send({
+            message: "validation requirements are not met",
+            errors: validationErrs.error.details.map(
+                (item: ValidationErrorItem) => item.message.replace(/["]/g, "'")
+            )
+        });
+        return;
+    }
     const { id } = req.params;
     USER_COLLECTION[id] = {
         ...USER_COLLECTION[id],
-        age,
-        login,
-        password,
+        ...req.body
     };
     res.status(200).send(USER_COLLECTION[id]);
 });
 
-router.post("/user", (req: express.Request, res: express.Response<User>) => {
+
+router.post("/user", (req: express.Request, res: express.Response<UserResponse>) => {
+    const validationErrs: ValidationResult<User> = UserCreateSchema.validate(req.body, {abortEarly: false});
+    if (validationErrs.error && !!validationErrs.error.details.length) {
+        res.status(400).send({
+            message: "validation requirements are not met",
+            errors: validationErrs.error.details.map(
+                (item: ValidationErrorItem) => item.message.replace(/["]/g, "'")
+            )
+        });
+        return;
+    }
     const { age = 0, login = "", password = "" } = req.body;
     const user: User = {
         id: uuidv4(),
@@ -108,7 +150,7 @@ router.post("/user", (req: express.Request, res: express.Response<User>) => {
     res.status(201).json(user);
 });
 
-router.delete("/user/:id", (req: express.Request, res: express.Response<{ message: string }>) => {
+router.delete("/user/:id", (req: express.Request, res: express.Response<UserResponse>) => {
     const { id } = req.params;
     USER_COLLECTION[id] = {
         ...USER_COLLECTION[id],
