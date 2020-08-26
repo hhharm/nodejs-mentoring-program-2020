@@ -8,7 +8,12 @@
     "hw1task1": "node homework-1/task-1-1.js",
     "hw1task2": "node homework-1/task-1-2.js",
     "hw1task3": "npx babel homework-1/task-1-3.js --out-dir dist && node dist/task-1-3.js",
+<<<<<<< HEAD
     "hw2task1": "ts-node homework-2/task-2.ts",
+=======
+    "hw2task1": "ts-node homework-2/task-2-1.ts",
+    "hw3task1": "ts-node homework-3/task-3.ts",
+>>>>>>> bc623ad... Task 3. Write table SQL, add folders and orm model
     "lint-hw2": " eslint homework-2  --ext .js,.ts",
     "lint-fix": " eslint ./  --ext .js,.ts --fix"
   },
@@ -32,7 +37,8 @@
     "@typescript-eslint/parser": "^3.8.0",
     "csvtojson": "^2.0.10",
     "eslint": "^7.6.0",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "sequelize": "^6.3.4"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
