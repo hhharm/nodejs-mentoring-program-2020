@@ -1,8 +1,28 @@
-import { startServer } from "./express-entry-point";
+import { initDb } from "./data-access/index";
+import { startServer } from "./routes/start-server";
 
-startServer();
+async function main() {
+  let db = await initDb();
+  if (!db) {
+    console.warn("DB connect has failed. Trying to init DB again");
+    db = await initDb();
+    if (!db) {
+      console.error("Cannot connect to DB! Exiting");
+      return;
+    }
+  }
+  startServer();
+}
 
-// todo: validation service
-// 404 in separate route
-// response type
-// use DB instead of collection (set correct address and rewrite controller functions)
+main();
+
+//Question: 
+
+// how to organize DI (orm model + controller)? 
+// I tried to pass UsersModel into constructor but it did not work
+
+// how to write errors handling? now it looks terrible =( (look in user.routes)
+
+// did I lose data mapping ? Shouldn't I map UsersModel -> User somewhere?
+
+// did I get the meaning of folders properly? (data-access, routes, services, models, etc)

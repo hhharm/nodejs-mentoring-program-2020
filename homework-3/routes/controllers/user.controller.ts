@@ -1,87 +1,72 @@
-import { v4 as uuidv4 } from "uuid";
-import { User, UserCreation } from "../../types/user";
-import { sortBy, slice, filter, find, findIndex } from "lodash";
-import { CODE_NOT_FOUND, CODE_OK, ResultCode } from "../../types/results";
+import { ValidationErrorItem, ValidationResult } from "hapi__joi";
+import { UsersModel } from "../../models/users.model";
+import { UserService } from "../../services/user.service";
+import { ResultCode, resultCode, ResultCodeValues } from "../../types/results";
+import {
+  User,
+  UserCreation,
+  UserSearchReq as UserSearchData,
+  UserUpdate
+} from "../../types/user";
+
+const userService = new UserService();
 
 export class UserController {
-  public getSuggestString(loginSubStr: string, limit: number): User[] {
-    const findUserByLoginSubstr = (user: User) =>
-      user.login.toLowerCase().includes(loginSubStr);
-    const users: User[] = sortBy(
-      slice(filter(USER_COLLECTION, findUserByLoginSubstr), 0, limit),
-      "login"
-    ) as User[];
-    return users;
+  public async userExists(id: string): Promise<boolean> {
+    return userService.exists(id);
   }
 
-  public getUser(id: string): User | undefined {
-    return find(USER_COLLECTION, { id });
+  public async getSuggestString(
+    loginSubStr: string,
+    limit: number
+  ): Promise<UsersModel[] | null> {
+    const searchData: UserSearchData = { loginSubStr, limit };
+    return userService.search(searchData);
   }
 
-  public updateUser({
+  public async getUser(id: string): Promise<UsersModel | null> {
+    return userService.getOneById(id);
+  }
+
+  public async updateUser({
     id,
     login,
     password,
     age,
-  }: UserCreation): User | undefined {
-    const userIndex: number = findIndex(USER_COLLECTION, { id });
-    if (userIndex === -1) {
-      return;
-    } else {
-      return {
-        ...USER_COLLECTION[userIndex],
-        age,
-        login,
-        password,
-      };
-    }
+  }: UserUpdate): Promise<boolean | null> {
+    const updateData = { login, password, age };
+    return userService.update(updateData, id);
   }
 
-  /**
-   * create user
-   */
-  public createUser({ login, password, age }: UserCreation): User {
-    const user: User = {
-      id: uuidv4(),
+  public async createUser({
+    login,
+    password,
+    age,
+  }: UserCreation): Promise<UsersModel | null> {
+    const userToCreate: UserCreation = {
       login,
       password,
       age,
-      isDeleted: false,
     };
-    USER_COLLECTION.push(user);
-    return user;
+    return userService.create(userToCreate);
   }
 
-  /**
-   * deleteUser
-   * 0 if deleted, 1 if not found
-   */
-  public deleteUser(id: string): ResultCode {
-    const userIndex = findIndex(USER_COLLECTION, { id });
-    if (userIndex === -1) {
-      return { code: CODE_NOT_FOUND };
+  public async deleteUser(id: string): Promise<number | null> {
+    return userService.softDelete(id);
+  }
+
+  public validateReq(user: User, schema: any): ResultCode {
+    const validationErrs: ValidationResult = schema.validate(user, {
+      abortEarly: false,
+    });
+    if (validationErrs.error && !!validationErrs.error.details.length) {
+      return {
+        code: ResultCodeValues.CODE_VALIDATION_ERROR,
+        value: validationErrs.error.details.map((item: ValidationErrorItem) =>
+          item.message.replace(/["]/g, "'")
+        ),
+      };
     }
-    USER_COLLECTION[userIndex] = {
-      ...USER_COLLECTION[userIndex],
-      isDeleted: true,
-    };
-    return { code: CODE_OK };
+    return resultCode(ResultCodeValues.CODE_OK);
   }
 }
-
-// todo: delete
-const ADMIN: User = {
-  id: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
-  login: "admin",
-  password: "password",
-  age: 25,
-  isDeleted: false,
-};
-const MODERATOR: User = {
-  id: "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed",
-  login: "moderator",
-  password: "password",
-  age: 23,
-  isDeleted: false,
-};
-const USER_COLLECTION: User[] = [ADMIN, MODERATOR];

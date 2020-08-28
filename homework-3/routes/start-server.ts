@@ -1,10 +1,17 @@
 import express from "express";
 import winston from "winston";
 import expressWinston from "express-winston";
-import { userRouter } from "./routes/user.router";
+import { userRouter } from "./user.router";
 
 const SERVER_PORT = process.env.SERVER_PORT || 3000;
-
+const handleError = (err: { statusCode: any; message: any }, res: any) => {
+  const { statusCode = 500, message = "Ooops! Something went wrong" } = err;
+  res.status(statusCode).json({
+    status: "error",
+    statusCode,
+    message,
+  });
+};
 export function startServer() {
   const app = express();
 
@@ -22,7 +29,11 @@ export function startServer() {
 
   app.use("/", userRouter);
 
+  app.use((err: any, req: any, res: any, next: any) => {
+    handleError(err, res);
+  });
+
   app.listen(SERVER_PORT, function () {
-    console.log("User REST API app listening on port 3000!");
+    console.log("Server has started app listening on port 3000!");
   });
 }

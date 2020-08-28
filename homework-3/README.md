@@ -1,32 +1,33 @@
-Simple app to keep User data and update it somehow
+Simple app to keep User data and update it somehow.
 
 Folder structure:
 
-(required)
 - data-access
-Everything connected to Data access (layer between models and services)
+
+connection with DB, etc
 
 - models
-DB models
+
+DB models (scheme, model creation)
 
 - routes
+
 api highlevel
 
 - routes / controllers
-detailed api
+
+detailed request processing
 
 - services
-business logic
 
-(added by me)
+business logic (used in controller, uses DB models)
+
 - types
-*.d.ts
 
-- configs
-all static data
+*.d.ts
 
 Some architecture highlights:
 ! Folders are split by functions.
-! One layer - one consern. Data handling, work with routing, business logic are separated and as independed as possible 
-! Dependency injection is used
+! One layer - one consern. Data handling, work with routing, business logic are separated and as independed as possible
 
+And there is very dumb mistakes handling, only req verification and not found are checked. Everything else return 500
