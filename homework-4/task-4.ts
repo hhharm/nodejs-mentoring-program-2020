@@ -1,5 +1,6 @@
 import { initDb } from "./data-access/index";
 import { startServer } from "./start-server";
+import { logger } from "./utils/logger.util";
 
 async function main() {
   let db = await initDb();
@@ -13,5 +14,16 @@ async function main() {
   }
   startServer();
 }
+
+// task 5.2, p.2
+process.on('uncaughtException', (err: any, origin: any) => {
+  logger.error(`Caught exception: ${err}\n` +
+  `Exception origin: ${origin}`);
+});
+
+// task 5.2, p.3
+process.on('unhandledRejection', (error: any) => {
+  logger.error('unhandledRejection', error.message);
+});
 
 main();

@@ -17,7 +17,7 @@ export function sendResult<T>(
     okCode: number = 200,
   ) {
     if (result === null) {
-      next();
+      next(new Error("unexpected result"))
     } else {
       response.status(okCode).send(result);
     }

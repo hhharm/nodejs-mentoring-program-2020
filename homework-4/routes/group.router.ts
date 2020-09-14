@@ -80,7 +80,7 @@ groupRouter.put(
           message: `Group with id ${updatedGroup} was updated.`,
         });
       } else {
-        next();
+        next(new Error("unexpected result"));
       }
     }, next);
   }
@@ -122,7 +122,7 @@ groupRouter.delete(
           message: `Group with id ${groupId} was deleted.`,
         });
       } else {
-        next();
+        next(new Error("unexpected result"));
       }
     }, next);
   }

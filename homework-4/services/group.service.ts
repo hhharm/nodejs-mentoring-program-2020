@@ -5,77 +5,44 @@ import { getDb } from "../../homework-4/data-access";
 
 export class GroupService {
 
-  public async exists(id: string): Promise<boolean | null> {
-    let group;
-    try {
-      group = await GroupModel.findOne({ where: { id } });
-    } catch (err) {
-      console.error("Error in groupExists: ", err);
-      return null;
-    }
+  public async exists(id: string): Promise<boolean> {
+    const group = await GroupModel.findOne({ where: { id } });
     return group !== null;
   }
 
-  public async getAll(): Promise<Array<Group> | null> {
-    try {
-      return await GroupModel.findAll();
-    } catch (err) {
-      console.error("find all groups failed: ", err);
-      return null;      
-    }
+  public async getAll(): Promise<Array<Group>> {
+    return await GroupModel.findAll();
   }
 
   public async getOneById(id: string): Promise<Group | null> {
-    try {
-      return await GroupModel.findOne({ where: { id } })
-    } catch(err) {
-      console.error("findOne failed: ", err);
-      return null;
-    };
+    return await GroupModel.findOne({ where: { id } });
   }
 
   public async update(
     user: Partial<Group>,
     id: string
-  ): Promise<boolean | null> {
-    let updatedModel: [number, Group[]];
-    try {
-       updatedModel = await GroupModel.update(user, {
+  ): Promise<boolean> {
+    const updatedModel: [number, Group[]] = await GroupModel.update(user, {
         where: { id },
       });
-    } catch(err) {
-      console.error("update failed: ", err);
-      return null;
-    };
+    
     // GroupModel.update returns [number of affecred rows]
-    return !!updatedModel ? updatedModel[0] === 1
-      : null;
+    return updatedModel[0] === 1;
   }
 
-  public async create(group: GroupCreation): Promise<Group | null> {
+  public async create(group: GroupCreation): Promise<Group> {
     const groupBuild = GroupModel.build(group);
-    try {
       const res = await groupBuild.save();
       return res;
-    } catch (err) {
-      console.error("cannot create group", err);
-      return null;
-    }
   }
 
-  public async delete(id: string): Promise<number | null> {
-    try {
-      const res = await GroupModel.destroy({ where: { id } })
-      return res;
-    } catch (err) {
-      console.error("cannot delete group", err);
-      return null;
-    }
+  public async delete(id: string): Promise<number> {
+      return await GroupModel.destroy({ where: { id } });
   }
 
-  public async addUsers(groupId: string, users: Array<string>): Promise<boolean | null> {
+  public async addUsers(groupId: string, users: Array<string>): Promise<boolean> {
     try {
-      // todo: store it in the class (init after DB init)
+      // todo: store DB in the class (save it only after DB init)
       const result = await getDb().transaction(
         async (t: any) => await Promise.all(
           users.map((userId: string) => 
@@ -88,7 +55,7 @@ export class GroupService {
       console.error("cannot add users to group", err, groupId, users);  
       // If the execution reaches this line, an error was thrown.
       // We rollback the transaction.
-      return null;
+      return false;
     }
   }
 }

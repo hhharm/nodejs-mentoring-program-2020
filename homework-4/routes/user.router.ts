@@ -21,7 +21,7 @@ export const userRouter = express.Router();
 
 userRouter.param(
   "id",
-  async (req: express.Request, res: express.Response, next) => {
+  async (req: express.Request, res: express.Response, next: NextFunction) => {
     const { id } = req.params;
 
     const userExist: boolean = await userController.userExists(id);
@@ -41,7 +41,7 @@ userRouter.param(
 // returns array of found users
 userRouter.get(
   UserRoutes.suggest,
-  async (req: Request, res: Response<UserResponse>, next) => {
+  async (req: Request, res: Response<UserResponse>, next: NextFunction) => {
     const loginSubstring: string = defaultTo(req.query.loginSubstring, "")
       .toString()
       .toLowerCase();
@@ -98,7 +98,7 @@ userRouter.put(
 
 userRouter.post(
   UserRoutes.user,
-  async (req: Request, res: Response<UserResponse>, next) => {
+  async (req: Request, res: Response<UserResponse>, next: NextFunction) => {
     const validationResult = validateReq(
       req.body,
       UserCreateSchema
@@ -134,7 +134,7 @@ userRouter.delete(
           message: `User with id ${userId} was deleted.`,
         });
       } else {
-        next();
+        next(new Error("unexpected result"));
       }
     }, next);
   }

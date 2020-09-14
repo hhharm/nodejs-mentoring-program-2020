@@ -13,56 +13,35 @@ export class UserService {
     };
   }
 
-  public async search(searchObj: UserSearch): Promise<UsersModel[] | null> {
+  public async search(searchObj: UserSearch): Promise<UsersModel[]> {
     const loginCond = searchObj.loginSubStr
       ? { where: { login: { [Op.iLike]: "%" + searchObj.loginSubStr + "%" } } }
       : {};
-      try {
         const res = await UsersModel.findAll({
           ...loginCond,
           limit: searchObj.limit || 0,
           order: [["login", "ASC"]],
         });
         return res;
-      } catch (err) {
-        console.error("error in getSuggestString: ", err);
-        return null;
-
-      }
   }
 
   public async getOneById(id: string): Promise<UsersModel | null> {
-    try {
       return await UsersModel.findOne({ where: { id } })
-    } catch (err) {
-      console.error("findOne failed: ", err);
-      return null;
-    }
   }
 
   public async update(
     user: Partial<User>,
     id: string
-  ): Promise<boolean | null> {
-    try {
+  ): Promise<boolean> {
       const updatedModel: [number, UsersModel[]] = await UsersModel.update(user,
          {where: { id },});
       // UsersModels.update returns [number of affecred rows]
-      return !!updatedModel ? updatedModel[0] === 1 : null;
-    } catch (err) {
-      console.error("update user failed: ", err);
-      return null;
-    }
+      return updatedModel[0] === 1;
   }
 
-  public async create(user: UserCreation): Promise<UsersModel | null> {
-    try {
+  public async create(user: UserCreation): Promise<UsersModel> {
     const userBuild = UsersModel.build(user);
-    return await userBuild.save()
-    } catch (err) {
-      console.error("cannot create", err);
-      return null;
-    };
+    return await userBuild.save();
   }
 
   public async delete(id: string): Promise<number | null> {
