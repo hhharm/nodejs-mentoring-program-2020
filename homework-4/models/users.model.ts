@@ -1,7 +1,15 @@
 import { DataTypes, Model, UUIDV4 } from "sequelize";
+import { idText } from "typescript";
 import { getDb } from "../data-access";
+import { User } from "../types/user";
 
-export class UsersModel extends Model {}
+export class UsersModel extends Model implements User {
+  id!: string;
+  login!: string;
+  password!: string;
+  age!: number;
+  isDeleted!: boolean;
+}
 
 const USER_FIELDS = {
   id: {

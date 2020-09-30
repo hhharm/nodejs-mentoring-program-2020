@@ -13,3 +13,11 @@ Add express middleware which will log which service method has been invoked and 
 Add errors log + 500 return code, unhandled exception, unhamdled promise rejection
 
 Add error messages in all controller functions
+
+- Extends homework-5
+
+Add jwt authorization.
+
+To get token send "/login" request, example: "/login?username=Olexandr&password=1996-10-20" and then send token in "n-access-token" header.
+
+Add cors, allow all

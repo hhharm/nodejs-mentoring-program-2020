@@ -26,7 +26,11 @@ export class UserService {
   }
 
   public async getOneById(id: string): Promise<UsersModel | null> {
-      return await UsersModel.findOne({ where: { id } })
+      return UsersModel.findOne({ where: { id } });
+  }
+
+  public async getOneByNameAndPass(login: string, password: string): Promise<UsersModel | null> {
+    return UsersModel.findOne({ where: { login, password } });
   }
 
   public async update(
