@@ -21,3 +21,11 @@ Add jwt authorization.
 To get token send "/login" request, example: "/login?username=Olexandr&password=1996-10-20" and then send token in "n-access-token" header.
 
 Add cors, allow all
+
+- Extends homework-6
+
+Add tests for user and group controllers (use Jest)
+
+Store DB connection string in .env and pass it to app using dotenv
+
+Tests can be started with `npm run test` command or `npm run test:watch` for watch mode

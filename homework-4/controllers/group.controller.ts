@@ -14,6 +14,7 @@ export class GroupController {
       throw(err);
     }  
   }
+
   public async get(id: string): Promise<Group | null> {
     try {
       return await groupService.getOneById(id);

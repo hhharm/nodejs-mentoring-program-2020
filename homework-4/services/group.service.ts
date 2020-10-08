@@ -31,7 +31,7 @@ export class GroupService {
   }
 
   public async create(group: GroupCreation): Promise<Group> {
-    const groupBuild = GroupModel.build(group);
+      const groupBuild = GroupModel.build(group);
       const res = await groupBuild.save();
       return res;
   }

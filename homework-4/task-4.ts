@@ -1,6 +1,9 @@
 import { initDb } from "./data-access/index";
 import { startServer } from "./start-server";
 import { logger } from "./utils/logger.util";
+import dotenv from "dotenv";
+
+dotenv.config()
 
 async function main() {
   let db = await initDb();

@@ -1,0 +1,5 @@
+{"service":"user-service","group":{},"level":"error","message":"Cannot update group"}
+{"service":"user-service","group":{},"level":"error","message":"Cannot create group"}
+{"service":"user-service","level":"error","message":"Cannot delete group"}
+{"service":"user-service","level":"error","message":"Could update user"}
+{"service":"user-service","level":"error","message":"Could create user"}

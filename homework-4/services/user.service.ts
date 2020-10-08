@@ -59,6 +59,6 @@ export class UserService {
 
   public async softDelete(id: string): Promise<number | null> {
     const res: boolean | null = await this.update({ isDeleted: true }, id);
-    return !!res ? null : 1;
+    return !!res ? 1 : null;
   }
 }
